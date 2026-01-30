@@ -186,6 +186,8 @@ const ReferenceDatabase = ({ user, isPremium }) => {
       ) : (
         <div className="references-grid">
           {references.map((ref) => (
+            console.log(ref.type),
+
             <div key={ref.id} className="reference-card">
               <div className="card-header">
                 <div className="card-icon">

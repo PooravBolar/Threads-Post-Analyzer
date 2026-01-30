@@ -67,19 +67,23 @@ export const getReferenceData = async (userId) => {
     const q = query(
       collection(db, 'referenceDatabase'),
       where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      
     );
     
     const querySnapshot = await getDocs(q);
     const references = [];
-    
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      console.log('Document data:', data);
+      
       references.push({
         id: doc.id,
-        ...doc.data()
+        ...data,
+        // Convert Firestore Timestamps to JavaScript dates for display
+        createdAt: data.createdAt?.toDate?.() || new Date(),
+        uploadedAt: data.uploadedAt?.toDate?.() || new Date(),
       });
     });
-    
     return references;
   } catch (error) {
     console.error('Error getting reference data:', error);
