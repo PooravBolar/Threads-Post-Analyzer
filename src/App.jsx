@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { Toaster } from 'react-hot-toast';
 import { auth, isFirebaseConfigured } from './firebase/config';
+import './components/theme.css';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import './App.css';
@@ -51,7 +52,9 @@ function App() {
     return (
       <div className="app">
         <Toaster position="top-right" />
-        <SetupScreen />
+        <div className="app-content">
+          <SetupScreen />
+        </div>
       </div>
     );
   }
@@ -80,7 +83,9 @@ function App() {
           },
         }}
       />
-      {user ? <Dashboard user={user} /> : <Login />}
+      <div className="app-content">
+        {user ? <Dashboard user={user} /> : <Login />}
+      </div>
     </div>
   );
 }

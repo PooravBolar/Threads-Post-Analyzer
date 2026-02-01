@@ -4,8 +4,9 @@ import { auth } from '../firebase/config';
 import { checkPremiumAccess } from '../services/firebaseService';
 import PostAnalyzer from './PostAnalyzer';
 import ReferenceDatabase from './ReferenceDatabase';
-import { LogOut, Sparkles, Database } from 'lucide-react';
+import { LogOut, Sparkles, Database, AtSign } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import './theme.css';
 import './Dashboard.css';
 
 const Dashboard = ({ user }) => {
@@ -45,15 +46,22 @@ const Dashboard = ({ user }) => {
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="header-content">
-          <h1 className="logo">Threads Analyzer</h1>
+          <div className="logo">
+            <img src="Threads.png" alt="Threads Logo" height={40}/>
+            <span className="logo-text">Threads Post Analyzer</span>
+          </div>
           <div className="header-actions">
-            {isPremium && (
-              <span className="premium-indicator">
-                <Sparkles size={16} />
+            <div className="premium-badge">
+                <Sparkles size={14} />
                 Premium
-              </span>
-            )}
-            <button onClick={handleSignOut} className="btn-icon" title="Sign Out">
+            </div>
+            
+            <button 
+              onClick={handleSignOut} 
+              className="btn-icon" 
+              title="Sign Out"
+              aria-label="Sign Out"
+            >
               <LogOut size={20} />
             </button>
           </div>
@@ -61,29 +69,35 @@ const Dashboard = ({ user }) => {
       </header>
 
       <nav className="dashboard-nav">
-        <button
-          className={`nav-tab ${activeTab === 'analyzer' ? 'active' : ''}`}
-          onClick={() => setActiveTab('analyzer')}
-        >
-          <Sparkles size={18} />
-          Post Analyzer
-        </button>
-        <button
-          className={`nav-tab ${activeTab === 'database' ? 'active' : ''}`}
-          onClick={() => setActiveTab('database')}
-        >
-          <Database size={18} />
-          Reference Database
-        </button>
+        <div className="nav-container">
+          <button
+            className={`nav-tab ${activeTab === 'analyzer' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analyzer')}
+            aria-label="Post Analyzer"
+          >
+            <Sparkles size={20} />
+            <span>Analyzer</span>
+          </button>
+          <button
+            className={`nav-tab ${activeTab === 'database' ? 'active' : ''}`}
+            onClick={() => setActiveTab('database')}
+            aria-label="Reference Database"
+          >
+            <Database size={20} />
+            <span>Database</span>
+          </button>
+        </div>
       </nav>
 
       <main className="dashboard-main">
-        {activeTab === 'analyzer' && (
-          <PostAnalyzer user={user} isPremium={isPremium} />
-        )}
-        {activeTab === 'database' && (
-          <ReferenceDatabase user={user} isPremium={isPremium} />
-        )}
+        <div className="dashboard-main-inner">
+          {activeTab === 'analyzer' && (
+            <PostAnalyzer user={user} isPremium="true" />
+          )}
+          {activeTab === 'database' && (
+            <ReferenceDatabase user={user} isPremium="true" />
+          )}
+        </div>
       </main>
     </div>
   );

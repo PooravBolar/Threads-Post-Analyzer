@@ -1,0 +1,43 @@
+rules_version = '2';
+
+// Firestore Security Rules — Threads Post Analyzer
+// Deploy: firebase deploy --only firestore
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: require auth
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper: user can only access their own doc by uid
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ——— users ———
+    // Used for premium flag. Only the user can read their own doc.
+    // Writes (e.g. isPremium) should be done via Admin SDK or Cloud Functions, not client.
+    match /users/{userId} {
+      allow read:  if isOwner(userId);
+      allow write: if false;
+    }
+
+    // ——— referenceDatabase ———
+    // Viral posts and PDF refs. Users can CRUD only documents where userId matches.
+    match /referenceDatabase/{docId} {
+      allow read, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create:  if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update:  if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ——— analysisHistory ———
+    // Analysis results. Users can read/create only their own; update/delete allowed for own docs.
+    match /analysisHistory/{docId} {
+      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

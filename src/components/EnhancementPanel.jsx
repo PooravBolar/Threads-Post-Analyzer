@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Copy, Check, Sparkles } from 'lucide-react';
+import { Copy, Check, Info } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import './EnhancementPanel.css';
 
@@ -7,11 +7,15 @@ const EnhancementPanel = ({ enhancements, originalPost, onSelect }) => {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [activeTab, setActiveTab] = useState('subtle');
 
-  const handleCopy = (text, index) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    toast.success('Copied to clipboard!');
-    setTimeout(() => setCopiedIndex(null), 2000);
+  const handleCopy = async (text, index) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      toast.success('Copied to clipboard!');
+      setTimeout(() => setCopiedIndex(null), 2000);
+    } catch (error) {
+      toast.error('Failed to copy');
+    }
   };
 
   const handleUse = (text) => {
@@ -33,70 +37,74 @@ const EnhancementPanel = ({ enhancements, originalPost, onSelect }) => {
     return '';
   };
 
+  const tabs = [
+    { id: 'subtle', label: 'Subtle' },
+    { id: 'moderate', label: 'Moderate' },
+    { id: 'complete', label: 'Complete Rewrite' }
+  ];
+
   return (
     <div className="enhancement-panel">
-      <div className="panel-header">
-        <div className="header-title">
-          <Sparkles size={20} />
-          <h2>AI-Enhanced Versions</h2>
-        </div>
-        <p className="header-subtitle">
+      <div className="enhancement-header">
+        <h3 className="enhancement-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          AI-Enhanced Versions
+        </h3>
+        <p className="enhancement-subtitle">
           Choose from AI-generated improvements based on your viral posts
         </p>
       </div>
 
       <div className="enhancement-tabs">
-        <button
-          className={`tab ${activeTab === 'subtle' ? 'active' : ''}`}
-          onClick={() => setActiveTab('subtle')}
-        >
-          Subtle
-        </button>
-        <button
-          className={`tab ${activeTab === 'moderate' ? 'active' : ''}`}
-          onClick={() => setActiveTab('moderate')}
-        >
-          Moderate
-        </button>
-        <button
-          className={`tab ${activeTab === 'complete' ? 'active' : ''}`}
-          onClick={() => setActiveTab('complete')}
-        >
-          Complete Rewrite
-        </button>
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={`enhancement-tab ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <div className="enhancement-content">
         <div className="enhanced-text">
-          {getEnhancementText() || 'No enhancement available'}
+          {getEnhancementText()}
         </div>
 
         {getExplanation() && (
           <div className="explanation">
-            <strong>What changed:</strong> {getExplanation()}
+            <Info size={16} />
+            <div className="explanation-content">
+              <strong>What changed:</strong> {getExplanation()}
+            </div>
           </div>
         )}
 
         <div className="enhancement-actions">
           <button
             onClick={() => handleCopy(getEnhancementText(), activeTab)}
-            className="btn btn-secondary"
+            className={`btn-copy ${copiedIndex === activeTab ? 'copied' : ''}`}
           >
             {copiedIndex === activeTab ? (
               <>
-                <Check size={16} />
+                <Check size={18} />
                 Copied!
               </>
             ) : (
               <>
-                <Copy size={16} />
+                <Copy size={18} />
                 Copy
               </>
             )}
           </button>
           <button
             onClick={() => handleUse(getEnhancementText())}
-            className="btn btn-primary"
+            className="btn-use"
           >
             Use This Version
           </button>

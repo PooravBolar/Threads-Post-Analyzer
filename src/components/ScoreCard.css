@@ -1,58 +1,177 @@
+/* Score Card Component */
 .score-card {
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
-  transition: transform 0.2s, border-color 0.2s;
+  position: relative;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+.score-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--score-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-base);
 }
 
 .score-card:hover {
+  background: var(--bg-elevated);
+  border-color: var(--score-color);
   transform: translateY(-2px);
-  border-color: var(--accent-color);
 }
 
-.score-header {
+.score-card:hover::before {
+  transform: scaleX(1);
+}
+
+.score-card .score-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.score-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .score-title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  flex: 1;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+  line-height: 1.3;
 }
 
-.score-circle {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 3px solid var(--score-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.score-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+.score-display {
+  position: relative;
+  width: 56px;
+  height: 56px;
   flex-shrink: 0;
 }
 
+.score-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+  fill: none;
+  stroke: var(--bg-elevated);
+  stroke-width: 4;
+}
+
+.score-ring-fill {
+  fill: none;
+  stroke: var(--score-color);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 157;
+  stroke-dashoffset: calc(157 - (157 * var(--score-value) / 100));
+  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
 .score-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--score-color);
+  line-height: 1;
 }
 
 .score-description {
   font-size: 12px;
+  line-height: 1.5;
   color: var(--text-secondary);
-  margin-bottom: 8px;
-  line-height: 1.4;
+  margin-bottom: var(--space-2);
 }
 
-.score-label {
+.score-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: var(--score-color);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
+  letter-spacing: 0.08em;
 }
+
+.score-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--score-color);
+  box-shadow: 0 0 8px var(--score-color);
+}
+
+/* Score Color Variants */
+.score-card.excellent {
+  --score-color: var(--success);
+}
+
+.score-card.good {
+  --score-color: var(--info);
+}
+
+.score-card.fair {
+  --score-color: var(--warning);
+}
+
+.score-card.poor {
+  --score-color: var(--error);
+}
+
+/* Animation on mount */
+@keyframes scoreReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.score-card {
+  animation: scoreReveal 0.3s ease-out backwards;
+}
+
+.score-card:nth-child(1) { animation-delay: 0.05s; }
+.score-card:nth-child(2) { animation-delay: 0.1s; }
+.score-card:nth-child(3) { animation-delay: 0.15s; }
+.score-card:nth-child(4) { animation-delay: 0.2s; }
+.score-card:nth-child(5) { animation-delay: 0.25s; }
+.score-card:nth-child(6) { animation-delay: 0.3s; }

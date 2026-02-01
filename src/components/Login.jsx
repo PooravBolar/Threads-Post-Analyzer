@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { toast } from 'react-hot-toast';
+import { Sparkles, AtSign } from 'lucide-react';
+import './theme.css';
 import './Login.css';
 
 const Login = () => {
@@ -23,7 +25,15 @@ const Login = () => {
         toast.success('Logged in successfully!');
       }
     } catch (error) {
-      toast.error(error.message);
+      const errorMessage = error.code === 'auth/user-not-found' 
+        ? 'No account found with this email'
+        : error.code === 'auth/wrong-password'
+        ? 'Incorrect password'
+        : error.code === 'auth/email-already-in-use'
+        ? 'Email already in use'
+        : error.message;
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -33,40 +43,51 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>Threads Post Analyzer</h1>
-          <p className="premium-badge">Premium Tool</p>
+          <img src="Threads.png" alt="Threads Logo" height={60}/>
+          <h1 className="login-title">Threads PostAnalyzer</h1>
+          <p className="login-subtitle">Optimize your posts for maximum engagement</p>
+          <div className="premium-badge">
+            <Sparkles size={12} />
+            Premium Tool
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
+            <label htmlFor="email" className="form-label">Email</label>
             <input
+              id="email"
               type="email"
-              placeholder="Email"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="form-input"
+              autoComplete="email"
             />
           </div>
 
           <div className="form-group">
+            <label htmlFor="password" className="form-label">Password</label>
             <input
+              id="password"
               type="password"
-              placeholder="Password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               className="form-input"
               minLength={6}
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="btn btn-primary"
+            className="btn-submit"
           >
-            {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+            {loading ? 'Loading...' : isSignUp ? 'Create Account' : 'Sign In'}
           </button>
         </form>
 
@@ -74,7 +95,7 @@ const Login = () => {
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="link-button"
+            className="toggle-mode"
           >
             {isSignUp
               ? 'Already have an account? Sign in'

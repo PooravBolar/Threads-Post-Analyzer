@@ -2,11 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="Threads.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Threads Post Analyzer - Premium</title>
+    <title>Threads Post Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .app-header {
+        text-align: center;
+        padding: 1.25rem 1.5rem 0;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      .app-header h1 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+        color: #fff;
+      }
+      .app-header p {
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: #888;
+        margin: 0.25rem 0 0;
+        text-transform: uppercase;
+      }
+    </style>
   </head>
-  <body style="background:#000;color:#fff;margin:0;">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
