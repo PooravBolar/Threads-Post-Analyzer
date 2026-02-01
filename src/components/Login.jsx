@@ -43,7 +43,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <img src="Threads.png" alt="Threads Logo" height={60}/>
+          <img src="public\Threads.png" alt="Threads Logo" height={60}/>
           <h1 className="login-title">Threads PostAnalyzer</h1>
           <p className="login-subtitle">Optimize your posts for maximum engagement</p>
           <div className="premium-badge">
