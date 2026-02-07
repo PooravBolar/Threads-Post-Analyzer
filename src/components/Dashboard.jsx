@@ -3,8 +3,9 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { checkPremiumAccess } from '../services/firebaseService';
 import PostAnalyzer from './PostAnalyzer';
+import DailyViralTopics from './DailyViralTopics';
 import ReferenceDatabase from './ReferenceDatabase';
-import { LogOut, Sparkles, Database, AtSign } from 'lucide-react';
+import { LogOut, Sparkles, Database, TrendingUp } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import './theme.css';
 import './Dashboard.css';
@@ -79,6 +80,14 @@ const Dashboard = ({ user }) => {
             <span>Analyzer</span>
           </button>
           <button
+            className={`nav-tab ${activeTab === 'daily-topics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('daily-topics')}
+            aria-label="Daily Viral Topics"
+          >
+            <TrendingUp size={20} />
+            <span>Daily Topics</span>
+          </button>
+          <button
             className={`nav-tab ${activeTab === 'database' ? 'active' : ''}`}
             onClick={() => setActiveTab('database')}
             aria-label="Reference Database"
@@ -93,6 +102,9 @@ const Dashboard = ({ user }) => {
         <div className="dashboard-main-inner">
           {activeTab === 'analyzer' && (
             <PostAnalyzer user={user} isPremium="true" />
+          )}
+          {activeTab === 'daily-topics' && (
+            <DailyViralTopics user={user} />
           )}
           {activeTab === 'database' && (
             <ReferenceDatabase user={user} isPremium="true" />
