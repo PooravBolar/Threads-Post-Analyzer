@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { analyzePost, generateRecommendations } from '../services/analysisEngine';
+import { analyzeFormatting, autoFormatPost } from '../services/formatAnalyzer';
 import { enhancePostWithContext } from '../services/geminiService';
 import { getReferenceData } from '../services/firebaseService';
 import { isOwner, getOwnerUid } from '../utils/owner';
@@ -26,6 +27,8 @@ const PostAnalyzer = ({ user, isPremium }) => {
   const [enhancements, setEnhancements] = useState(null);
   const [enhancing, setEnhancing] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
+  const [formatAnalysis, setFormatAnalysis] = useState(null);
+  const [formatting, setFormatting] = useState(false);
 
   const handleAnalyze = async () => {
     if (!postText.trim()) {
@@ -84,6 +87,36 @@ const PostAnalyzer = ({ user, isPremium }) => {
     } finally {
       setEnhancing(false);
     }
+  };
+
+  const handleFormatAnalyze = () => {
+    if (!postText.trim()) {
+      toast.error('Please enter a post to analyze formatting');
+      return;
+    }
+    setFormatting(true);
+    try {
+      const formatResults = analyzeFormatting(postText);
+      setFormatAnalysis(formatResults);
+      toast.success('Formatting analysis complete!');
+    } catch (error) {
+      toast.error('Error analyzing formatting');
+      console.error(error);
+    } finally {
+      setFormatting(false);
+    }
+  };
+
+  const handleAutoFormat = () => {
+    if (!postText.trim()) {
+      toast.error('Please enter a post to format');
+      return;
+    }
+    const formatted = autoFormatPost(postText);
+    setPostText(formatted);
+    const formatResults = analyzeFormatting(formatted);
+    setFormatAnalysis(formatResults);
+    toast.success('Post auto-formatted!');
   };
 
   const getPriorityIcon = (priority) => {
@@ -168,7 +201,7 @@ const PostAnalyzer = ({ user, isPremium }) => {
                 )}
               </button>
 
-             <button
+              <button
                   onClick={handleEnhance}
                   disabled={enhancing || !postText.trim() || !scores}
                   className="btn btn-premium"
@@ -182,6 +215,15 @@ const PostAnalyzer = ({ user, isPremium }) => {
                       Enhance with AI
                     </>
                   )}
+              </button>
+
+              <button
+                onClick={handleFormatAnalyze}
+                disabled={formatting || !postText.trim()}
+                className="btn btn-secondary"
+                aria-label="Analyze formatting"
+              >
+                {formatting ? 'Checking Format...' : 'Analyze Formatting'}
               </button>
               
             </div>
@@ -202,6 +244,88 @@ const PostAnalyzer = ({ user, isPremium }) => {
             originalPost={postText}
             onSelect={(text) => setPostText(text)}
           />
+        )}
+
+        {formatAnalysis && (
+          <div className="card format-card">
+            <div className="card-header">
+              <h2 className="card-title">Format Analyzer</h2>
+              <p className="card-subtitle">
+                Formatting-only diagnostics (no content judgement).
+              </p>
+            </div>
+            <div className="card-body">
+              <div className="format-score">
+                <div>
+                  <div className="format-score-value">
+                    Format Score: {formatAnalysis.formatScore}/10
+                  </div>
+                  <div className="format-score-meta">
+                    Scrollability Score: {formatAnalysis.scrollabilityScore}/10
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAutoFormat}
+                  className="btn btn-secondary"
+                >
+                  Auto-format this post
+                </button>
+              </div>
+
+              <div className="format-issues">
+                <div>
+                  <h4>Issues Found</h4>
+                  <ul>
+                    {formatAnalysis.issues.map((issue, index) => (
+                      <li key={`issue-${index}`}>{issue}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4>Quick Fix</h4>
+                  <ul>
+                    {formatAnalysis.quickFixes.map((fix, index) => (
+                      <li key={`fix-${index}`}>{fix}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="format-metrics">
+                <div className="format-metric">
+                  <div className="format-metric-title">Line Density</div>
+                  <div className="format-metric-value">
+                    {formatAnalysis.avgCharsPerLine} chars/line
+                  </div>
+                  <div className="format-metric-status">{formatAnalysis.lineDensityStatus}</div>
+                  <p>{formatAnalysis.lineDensitySuggestion}</p>
+                </div>
+                <div className="format-metric">
+                  <div className="format-metric-title">Paragraph Chunking</div>
+                  <div className="format-metric-value">
+                    {formatAnalysis.longParagraphCount} long paragraphs
+                  </div>
+                  <div className="format-metric-status">{formatAnalysis.paragraphStatus}</div>
+                  <p>{formatAnalysis.paragraphSuggestion}</p>
+                </div>
+                <div className="format-metric">
+                  <div className="format-metric-title">Whitespace Ratio</div>
+                  <div className="format-metric-value">
+                    {formatAnalysis.whiteSpaceRatio * 100}%
+                  </div>
+                  <div className="format-metric-status">{formatAnalysis.whiteSpaceStatus}</div>
+                  <p>{formatAnalysis.whiteSpaceSuggestion}</p>
+                </div>
+                <div className="format-metric">
+                  <div className="format-metric-title">Structure Pattern</div>
+                  <div className="format-metric-value">{formatAnalysis.listStatus}</div>
+                  <div className="format-metric-status">Pattern Check</div>
+                  <p>{formatAnalysis.listSuggestion}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Results Section */}
